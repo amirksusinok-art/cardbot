@@ -160,8 +160,18 @@ export const TopNav: React.FC<TopNavProps> = ({
         </button>
 
         <button
+          onClick={() => handleSelect('tasks')}
+          className={`flex flex-col items-center space-y-1 py-1 px-2.5 rounded-xl transition-all ${
+            currentTab === 'tasks' ? 'text-amber-400 font-bold' : 'text-[#8E929B] hover:text-white'
+          }`}
+        >
+          <Target className="w-5 h-5" />
+          <span className="text-[10px] font-mono">Задания</span>
+        </button>
+
+        <button
           onClick={() => handleSelect('albums')}
-          className={`flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition-all ${
+          className={`flex flex-col items-center space-y-1 py-1 px-2.5 rounded-xl transition-all ${
             currentTab === 'albums' ? 'text-emerald-400 font-bold' : 'text-[#8E929B] hover:text-white'
           }`}
         >
@@ -170,18 +180,8 @@ export const TopNav: React.FC<TopNavProps> = ({
         </button>
 
         <button
-          onClick={() => handleSelect('shop')}
-          className={`flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition-all ${
-            currentTab === 'shop' ? 'text-yellow-400 font-bold' : 'text-[#8E929B] hover:text-white'
-          }`}
-        >
-          <Star className="w-5 h-5" />
-          <span className="text-[10px] font-mono">Stars</span>
-        </button>
-
-        <button
           onClick={() => handleSelect('profile')}
-          className={`flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition-all ${
+          className={`flex flex-col items-center space-y-1 py-1 px-2.5 rounded-xl transition-all ${
             currentTab === 'profile' ? 'text-purple-400 font-bold' : 'text-[#8E929B] hover:text-white'
           }`}
         >

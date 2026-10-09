@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { UserProfile, Card, LeaderboardUser } from '../types.js';
 import { CardPreview } from './CardPreview.js';
 import { triggerHaptic } from '../utils/telegram.js';
-import { Award, Crown, Star, Trophy, Users, Shield, Sparkles } from 'lucide-react';
+import { Award, Crown, Star, Trophy, Users, Shield, Sparkles, ShoppingBag, History } from 'lucide-react';
 
 interface ProfileViewProps {
   user: UserProfile;
@@ -10,6 +10,8 @@ interface ProfileViewProps {
   favorites: Card[];
   leaderboard: LeaderboardUser[];
   onOpenCard: (card: Card) => void;
+  onOpenShop?: () => void;
+  onOpenHistory?: () => void;
 }
 
 export function getRankTitle(score: number): string {
@@ -26,6 +28,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   favorites,
   leaderboard,
   onOpenCard,
+  onOpenShop,
+  onOpenHistory,
 }) => {
   const [tab, setTab] = useState<'profile' | 'leaderboard'>('profile');
 
@@ -90,6 +94,41 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 {rank}
               </div>
             </div>
+          </div>
+
+          {/* Quick Shortcuts: Stars Shop & Transaction History */}
+          <div className="grid grid-cols-2 gap-2.5">
+            <button
+              onClick={() => {
+                triggerHaptic('light');
+                onOpenShop?.();
+              }}
+              className="bg-[#12141F] hover:bg-[#181B2A] border border-white/10 rounded-2xl p-3 flex items-center space-x-2.5 text-left transition-all active:scale-[0.98]"
+            >
+              <div className="w-8 h-8 rounded-xl bg-amber-400/10 flex items-center justify-center text-amber-400 shrink-0">
+                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              </div>
+              <div className="truncate">
+                <span className="text-xs font-bold text-white block truncate">Магазин Stars</span>
+                <span className="text-[10px] text-zinc-400 font-mono block">Косметика</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => {
+                triggerHaptic('light');
+                onOpenHistory?.();
+              }}
+              className="bg-[#12141F] hover:bg-[#181B2A] border border-white/10 rounded-2xl p-3 flex items-center space-x-2.5 text-left transition-all active:scale-[0.98]"
+            >
+              <div className="w-8 h-8 rounded-xl bg-blue-400/10 flex items-center justify-center text-blue-400 shrink-0">
+                <History className="w-4 h-4" />
+              </div>
+              <div className="truncate">
+                <span className="text-xs font-bold text-white block truncate">История</span>
+                <span className="text-[10px] text-zinc-400 font-mono block">Операции</span>
+              </div>
+            </button>
           </div>
 
           {/* Card of the Day («КАРТА ДНЯ») */}

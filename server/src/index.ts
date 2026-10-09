@@ -2,14 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
-import { fileURLToPath } from 'url';
 import { CONFIG } from './config.js';
 import { getDb } from './db.js';
 import { initBot } from './bot.js';
 import { router } from './routes.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
@@ -27,7 +23,7 @@ async function startServer() {
   app.use('/api', router);
 
   // Serve Frontend static assets if built
-  const clientDist = path.resolve(__dirname, '../../client/dist');
+  const clientDist = path.resolve(process.cwd(), 'client/dist');
   if (fs.existsSync(clientDist)) {
     console.log(`[SERVER] Serving static frontend from ${clientDist}`);
     app.use(express.static(clientDist));

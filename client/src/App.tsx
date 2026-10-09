@@ -261,6 +261,7 @@ export const App: React.FC = () => {
               onOpenCollection={() => setCurrentTab('collection')}
               onToggleFavorite={handleToggleFavorite}
               onSetCardOfDay={handleSetCardOfDay}
+              onOpenProfile={() => setCurrentTab('profile')}
               onOpenMenu={() => setIsMenuOpen(true)}
               isLoading={isMinting}
             />
@@ -305,6 +306,8 @@ export const App: React.FC = () => {
                 setLatestCard(card);
                 setCurrentTab('mint');
               }}
+              onOpenShop={() => setCurrentTab('shop')}
+              onOpenHistory={() => setCurrentTab('history')}
             />
           )}
 

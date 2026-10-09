@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, UserProfile, UserStats, CategoryName } from '../types.js';
 import { CardPreview } from './CardPreview.js';
 import { triggerHaptic } from '../utils/telegram.js';
-import { Sparkles, Coins, Zap, Clock, Star, Share2, Crown, ChevronRight, Gift, Layers, ShieldCheck } from 'lucide-react';
+import { Coins, Zap, Clock, Star, Share2, Crown, Menu, Sparkles } from 'lucide-react';
 
 interface MintTerminalProps {
   user: UserProfile;
@@ -14,6 +14,7 @@ interface MintTerminalProps {
   onToggleFavorite: (cardId: string) => void;
   onSetCardOfDay: (cardId: string) => void;
   onOpenProfile: () => void;
+  onOpenMenu: () => void;
   isLoading: boolean;
 }
 
@@ -41,11 +42,11 @@ export const MintTerminal: React.FC<MintTerminalProps> = ({
   stats,
   latestCard,
   onMintClick,
-  onOpenTasks,
   onOpenCollection,
   onToggleFavorite,
   onSetCardOfDay,
   onOpenProfile,
+  onOpenMenu,
   isLoading,
 }) => {
   const [cooldown, setCooldown] = useState(stats.bomzhCooldownRemaining);
@@ -77,7 +78,7 @@ export const MintTerminal: React.FC<MintTerminalProps> = ({
       navigator.share({ title: 'Black Cards & VIP Plastic', text: shareText }).catch(() => {});
     } else {
       navigator.clipboard.writeText(shareText);
-      alert('Данные карты скопированы!');
+      alert('Данные карты скопированы в буфер!');
     }
   };
 
@@ -85,169 +86,127 @@ export const MintTerminal: React.FC<MintTerminalProps> = ({
   const catMeta = latestCard ? CATEGORY_META[latestCard.category] : null;
 
   return (
-    <div className="flex flex-col w-full max-w-[440px] mx-auto space-y-4 pb-20 animate-fadeIn">
-      {/* 1. ШАПКА (HEADER) — По канонам Revolut / Apple Wallet */}
-      <div className="flex items-center justify-between px-1 py-1">
-        {/* Слева: Аккуратная аватарка и ник */}
-        <button
-          onClick={onOpenProfile}
-          className="flex items-center space-x-2.5 group active:scale-95 transition-all text-left"
-        >
-          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-zinc-800 to-zinc-700 border border-white/[0.08] flex items-center justify-center font-bold text-xs text-white shadow-sm">
-            {user.firstName ? user.firstName[0].toUpperCase() : 'V'}
-          </div>
-          <div>
-            <span className="font-extrabold text-sm text-white block leading-tight group-hover:text-amber-400 transition-colors">
+    <div className="flex flex-col w-full max-w-[420px] mx-auto min-h-[calc(100vh-96px)] justify-between pb-20 pt-1 animate-fadeIn">
+      {/* 1. ВЕРХНЯЯ ШАПКА: Меню, Профиль и Баланс Coins */}
+      <div className="flex items-center justify-between py-2 px-1">
+        {/* Слева: Кнопка Меню и Профиль */}
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => {
+              triggerHaptic('light');
+              onOpenMenu();
+            }}
+            className="p-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-zinc-300 hover:text-white active:scale-95 transition-all"
+            title="Меню"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          <button
+            onClick={() => {
+              triggerHaptic('light');
+              onOpenProfile();
+            }}
+            className="flex items-center space-x-2 px-2.5 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] active:scale-95 transition-all text-left"
+          >
+            <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center font-black text-[11px] text-zinc-950 shadow-sm">
+              {user.firstName ? user.firstName[0].toUpperCase() : 'V'}
+            </div>
+            <span className="font-bold text-xs text-white max-w-[110px] truncate">
               {user.firstName || user.username}
             </span>
-            <span className="text-[10px] font-mono text-[#8E929B] block">
-              VIP Collector
-            </span>
-          </div>
-        </button>
+          </button>
+        </div>
 
-        {/* Справа: Плашка баланса — иконка монетки + Coins */}
-        <div className="flex items-center space-x-1.5 bg-[#16181D] border border-white/[0.06] px-3.5 py-1.5 rounded-full shadow-sm">
-          <Coins className="w-4 h-4 text-amber-400" />
+        {/* Справа: Баланс игровых Coins */}
+        <div className="flex items-center space-x-1.5 bg-[#16181D] border border-white/[0.08] px-3.5 py-1.5 rounded-full shadow-sm">
+          <Coins className="w-4 h-4 text-amber-400 shrink-0" />
           <span className="font-mono font-black text-sm text-white">
             {user.coins.toLocaleString('ru-RU')}
           </span>
-          <span className="text-[10px] text-[#8E929B] font-mono">Coins</span>
+          <span className="text-[10px] text-zinc-400 font-mono">Coins</span>
         </div>
       </div>
 
-      {/* 2. САМА КАРТА (ГЛАВНЫЙ ВИЗУАЛЬНЫЙ ЦЕНТР) */}
-      <div className="w-full">
+      {/* 2. ЦЕНТР: САМА КАРТА И ЛЕГКАЯ СТРОКА ДЕЙСТВИЙ */}
+      <div className="my-auto py-2 space-y-3">
         {latestCard ? (
-          <div className="space-y-3">
+          <>
             <CardPreview
               card={latestCard}
               equippedHolder={user.equippedHolder}
               equippedEffect={user.equippedEffect}
             />
 
-            {/* 3. ИНФОРМАЦИОННЫЙ БЛОК ПОД КАРТОЙ (Легкие виджеты без рамочной таблицы) */}
-            
-            {/* Статус редкости: Компактный бейдж по центру прямо под картой */}
-            <div className="flex justify-center pt-0.5">
-              <div className={`px-4 py-1 rounded-full bg-white/[0.04] border text-xs font-mono font-bold flex items-center space-x-2 ${
-                catMeta ? catMeta.glow : 'border-white/[0.08] text-white'
-              }`}>
+            {/* Компактная панель прямо под картой: Категория/Очки слева + Кнопки справа */}
+            <div className="flex items-center justify-between px-1 pt-1">
+              {/* Бейдж категории и рейтинга */}
+              <div
+                className={`px-3 py-1.5 rounded-xl bg-white/[0.04] border text-xs font-mono font-bold flex items-center space-x-1.5 ${
+                  catMeta ? catMeta.glow : 'border-white/[0.08] text-white'
+                }`}
+              >
                 <span>{catMeta ? catMeta.icon : '💳'}</span>
                 <span>{catMeta ? catMeta.label : latestCard.category}</span>
-                <span className="text-white/40">•</span>
+                <span className="text-white/30">•</span>
                 <span className="text-amber-400 font-extrabold">{latestCard.score.toLocaleString()} PTS</span>
               </div>
-            </div>
 
-            {/* Характеристики: 2 аккуратные карточки с прозрачным фоном rgba(255,255,255,0.05) */}
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              {/* Карточка 1: Материал */}
-              <div className="bg-[#16181D]/80 border border-white/[0.06] rounded-2xl p-3 flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-xl bg-white/[0.05] flex items-center justify-center text-sm shrink-0">
-                  💎
-                </div>
-                <div className="truncate">
-                  <span className="text-[10px] text-[#8E929B] block font-mono">Материал</span>
-                  <span className="text-xs font-bold text-white truncate block">{latestCard.material}</span>
-                </div>
+              {/* Быстрые действия: Основная, Избранное, Поделиться */}
+              <div className="flex items-center space-x-1.5">
+                <button
+                  onClick={() => {
+                    triggerHaptic('success');
+                    onSetCardOfDay(latestCard.id);
+                  }}
+                  className={`p-2 rounded-xl border text-xs transition-all ${
+                    isCardOfDay
+                      ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+                      : 'bg-white/[0.04] border-white/[0.08] text-zinc-400 hover:text-white'
+                  }`}
+                  title={isCardOfDay ? 'Основная карта' : 'Сделать основной'}
+                >
+                  <Crown className="w-4 h-4" />
+                </button>
+
+                <button
+                  onClick={() => {
+                    triggerHaptic('medium');
+                    onToggleFavorite(latestCard.id);
+                  }}
+                  className={`p-2 rounded-xl border text-xs transition-all ${
+                    latestCard.is_favorite
+                      ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
+                      : 'bg-white/[0.04] border-white/[0.08] text-zinc-400 hover:text-white'
+                  }`}
+                  title="В избранное"
+                >
+                  <Star className={`w-4 h-4 ${latestCard.is_favorite ? 'fill-amber-400 text-amber-400' : ''}`} />
+                </button>
+
+                <button
+                  onClick={handleShare}
+                  className="p-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-zinc-400 hover:text-white active:scale-95 transition-all"
+                  title="Поделиться"
+                >
+                  <Share2 className="w-4 h-4" />
+                </button>
               </div>
-
-              {/* Карточка 2: Серия/Узор */}
-              <div className="bg-[#16181D]/80 border border-white/[0.06] rounded-2xl p-3 flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-xl bg-white/[0.05] flex items-center justify-center text-sm shrink-0">
-                  🔢
-                </div>
-                <div className="truncate">
-                  <span className="text-[10px] text-[#8E929B] block font-mono">Серия узора</span>
-                  <span className="text-xs font-bold text-white truncate block">{latestCard.collection_code}</span>
-                </div>
-              </div>
             </div>
-
-            {/* Кнопки быстрых действий под картой */}
-            <div className="flex items-center space-x-2 pt-0.5">
-              <button
-                onClick={() => {
-                  triggerHaptic('success');
-                  onSetCardOfDay(latestCard.id);
-                }}
-                className={`flex-1 py-2 rounded-xl text-xs font-mono font-bold border transition-all flex items-center justify-center space-x-1.5 ${
-                  isCardOfDay
-                    ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300'
-                    : 'bg-[#16181D]/70 border-white/[0.06] text-[#8E929B] hover:text-white'
-                }`}
-              >
-                <Crown className="w-3.5 h-3.5" />
-                <span>{isCardOfDay ? '✓ Основная' : 'Основная'}</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  triggerHaptic('medium');
-                  onToggleFavorite(latestCard.id);
-                }}
-                className={`flex-1 py-2 rounded-xl text-xs font-mono font-bold border transition-all flex items-center justify-center space-x-1.5 ${
-                  latestCard.is_favorite
-                    ? 'bg-amber-500/15 border-amber-500/30 text-amber-300'
-                    : 'bg-[#16181D]/70 border-white/[0.06] text-[#8E929B] hover:text-white'
-                }`}
-              >
-                <Star className={`w-3.5 h-3.5 ${latestCard.is_favorite ? 'fill-amber-400 text-amber-400' : ''}`} />
-                <span>{latestCard.is_favorite ? 'В избранном' : 'В избранное'}</span>
-              </button>
-
-              <button
-                onClick={handleShare}
-                className="w-10 h-8.5 rounded-xl bg-[#16181D]/70 border border-white/[0.06] flex items-center justify-center text-[#8E929B] hover:text-white active:scale-95 transition-all"
-                title="Поделиться"
-              >
-                <Share2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
+          </>
         ) : (
-          <div className="aspect-[1.586/1] w-full rounded-[18px] border border-dashed border-white/[0.1] bg-[#16181D]/40 flex flex-col items-center justify-center p-6 text-center shadow-xl">
-            <Sparkles className="w-10 h-10 text-amber-400/60 mb-3 animate-pulse" />
-            <h3 className="text-sm font-bold text-white">Терминал готов к выпуску</h3>
-            <p className="text-xs text-[#8E929B] mt-1 max-w-[240px]">
-              Нажмите кнопку ниже, чтобы выпустить свою первую карту!
+          <div className="aspect-[1.586/1] w-full rounded-[18px] border border-dashed border-white/[0.12] bg-[#12141A] flex flex-col items-center justify-center p-6 text-center shadow-xl">
+            <Sparkles className="w-10 h-10 text-amber-400/70 mb-3 animate-pulse" />
+            <h3 className="text-sm font-bold text-white tracking-wide">Терминал готов к выпуску</h3>
+            <p className="text-xs text-zinc-400 mt-1 max-w-[240px]">
+              Нажмите кнопку ниже, чтобы сгенерировать новую виртуальную карту!
             </p>
           </div>
         )}
       </div>
 
-      {/* 4. БЛОК ДЕЙЛИКОВ (Мини-баннер вместо широкой полосы) */}
-      <button
-        onClick={onOpenTasks}
-        className="w-full bg-[#16181D] hover:bg-[#1c1f26] border border-white/[0.06] rounded-2xl p-3 flex items-center justify-between text-xs font-mono transition-all group active:scale-[0.99]"
-      >
-        <div className="flex items-center space-x-2.5">
-          <div className="w-7 h-7 rounded-lg bg-amber-400/10 flex items-center justify-center text-amber-400">
-            <Gift className="w-4 h-4" />
-          </div>
-          <span className="text-white font-semibold">
-            Задания дня: <b className="text-amber-400">{stats.completedTasksCount}/{stats.totalTasksCount}</b>
-          </span>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          {/* Тонкий прогресс-бар */}
-          <div className="w-16 h-1.5 bg-black/40 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-amber-400 rounded-full"
-              style={{ width: `${(stats.completedTasksCount / Math.max(1, stats.totalTasksCount)) * 100}%` }}
-            />
-          </div>
-          <span className="text-[11px] font-bold text-amber-400">
-            +500 Coins
-          </span>
-          <ChevronRight className="w-3.5 h-3.5 text-[#8E929B] group-hover:text-white" />
-        </div>
-      </button>
-
-      {/* 5. ГЛАВНАЯ КНОПКА ДЕЙСТВИЯ (CTA) — Сочная, насыщенная */}
-      <div className="pt-1 space-y-2">
+      {/* 3. НИЗ: ГЛАВНАЯ КНОПКА ВЫПУСКА И ССЫЛКА НА КОЛЛЕКЦИЮ */}
+      <div className="pt-2 space-y-2.5 px-1">
         {canMintNormal ? (
           <button
             onClick={() => {
@@ -255,49 +214,49 @@ export const MintTerminal: React.FC<MintTerminalProps> = ({
               onMintClick();
             }}
             disabled={isLoading}
-            className="w-full h-14 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center space-x-2.5 text-zinc-950 font-black text-sm sm:text-base tracking-wide shadow-[0_0_25px_rgba(245,158,11,0.25)]"
+            className="w-full h-14 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center space-x-2 text-zinc-950 font-black text-sm tracking-wide shadow-[0_4px_20px_rgba(245,158,11,0.25)]"
           >
             <Zap className="w-5 h-5 fill-zinc-950" />
             <span>ВЫПУСТИТЬ КАРТУ • 500 COINS</span>
           </button>
         ) : (
-          /* Бесплатный режим «БОМЖ» */
-          <div className="space-y-1.5">
-            <button
-              onClick={() => {
-                if (canMintBomzh) {
-                  triggerHaptic('heavy');
-                  onMintClick();
-                }
-              }}
-              disabled={isLoading || cooldown > 0}
-              className={`w-full h-14 rounded-2xl flex items-center justify-center space-x-2.5 font-black text-sm tracking-wide transition-all ${
-                cooldown > 0
-                  ? 'bg-[#16181D] border border-white/[0.06] text-zinc-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-[0_0_20px_rgba(225,29,72,0.3)] active:scale-[0.98]'
-              }`}
-            >
-              {cooldown > 0 ? (
-                <>
-                  <Clock className="w-4 h-4 animate-spin text-zinc-500" />
-                  <span>ПЕРЕЗАРЯДКА: {cooldown} СЕК.</span>
-                </>
-              ) : (
-                <>
-                  <Zap className="w-4 h-4 fill-current" />
-                  <span>РЕЖИМ «БОМЖ» • 0 COINS</span>
-                </>
-              )}
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              if (canMintBomzh) {
+                triggerHaptic('heavy');
+                onMintClick();
+              }
+            }}
+            disabled={isLoading || cooldown > 0}
+            className={`w-full h-14 rounded-2xl flex items-center justify-center space-x-2 font-black text-sm tracking-wide transition-all ${
+              cooldown > 0
+                ? 'bg-[#16181D] border border-white/[0.06] text-zinc-500 cursor-not-allowed'
+                : 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-[0_4px_20px_rgba(225,29,72,0.3)] active:scale-[0.98]'
+            }`}
+          >
+            {cooldown > 0 ? (
+              <>
+                <Clock className="w-4 h-4 animate-spin text-zinc-500" />
+                <span>ПЕРЕЗАРЯДКА: {cooldown} СЕК.</span>
+              </>
+            ) : (
+              <>
+                <Zap className="w-4 h-4 fill-current" />
+                <span>РЕЖИМ «БОМЖ» • 0 COINS</span>
+              </>
+            )}
+          </button>
         )}
 
-        {/* Кликабельная ссылка со склонением */}
+        {/* Ссылка на коллекцию со склонением */}
         <button
-          onClick={onOpenCollection}
-          className="w-full py-1 text-center text-xs font-mono text-[#8E929B] hover:text-white transition-colors"
+          onClick={() => {
+            triggerHaptic('light');
+            onOpenCollection();
+          }}
+          className="w-full py-1 text-center text-xs font-mono text-zinc-400 hover:text-white transition-colors"
         >
-          В коллекции: <b className="text-white underline">{getCardPlural(stats.totalCards)}</b> →
+          В коллекции: <span className="text-white font-bold underline underline-offset-2">{getCardPlural(stats.totalCards)}</span> →
         </button>
       </div>
     </div>

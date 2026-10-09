@@ -168,9 +168,9 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
         </div>
 
         {/* 2. CENTER: Bold Embossed Monospace Card Number */}
-        <div className="relative z-10 my-auto py-1 text-center">
+        <div className="relative z-10 my-auto py-1 text-center overflow-hidden">
           <div
-            className={`font-mono font-black tracking-[0.14em] text-lg sm:text-2xl transition-all ${
+            className={`font-mono font-black tracking-widest text-[15px] sm:text-xl truncate whitespace-nowrap transition-all ${
               isEffectActive
                 ? 'effect-cyber-neon drop-shadow-[0_0_12px_#00e5ff]'
                 : matStyle.isLight
