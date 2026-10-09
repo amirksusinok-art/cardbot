@@ -1,0 +1,5 @@
+{
+  "name": "cardbot-client",
+  "private": true,
+  "type": "module"
+}

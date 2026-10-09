@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: black-cards-vip
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: BOT_TOKEN
+        sync: false
+      - key: RENDER_EXTERNAL_URL
+        fromService:
+          type: web
+          name: black-cards-vip
+          property: host
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cardbot-db
+          property: connectionString
+
+databases:
+  - name: cardbot-db
+    plan: free
+    databaseName: cardbot
+    user: cardbot_user
