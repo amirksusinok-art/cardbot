@@ -37,9 +37,11 @@ export const App: React.FC = () => {
   const [showReel, setShowReel] = useState(false);
   const [latestCard, setLatestCard] = useState<Card | null>(null);
 
-  // Modals state
+  // Menu & Modals state
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [supportInitialTab, setSupportInitialTab] = useState<'support' | 'policy'>('support');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
 
@@ -58,7 +60,6 @@ export const App: React.FC = () => {
       setFavorites(meData.favorites);
       setLatestCard(meData.cardOfDay);
 
-      // Load other endpoints in parallel
       const [cardsData, albumsData, tasksData, shopData] = await Promise.all([
         api.getCards(),
         api.getAlbums(),
@@ -77,7 +78,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Load Leaderboard when entering profile
   useEffect(() => {
     if (currentTab === 'profile') {
       api.getLeaderboard().then(d => setLeaderboard(d.leaderboard || [])).catch(() => {});
@@ -87,7 +87,6 @@ export const App: React.FC = () => {
     }
   }, [currentTab]);
 
-  // Handle Mint Card action
   const handleMint = async () => {
     if (isMinting) return;
     setIsMinting(true);
@@ -97,7 +96,6 @@ export const App: React.FC = () => {
       setPendingCard(res.card);
       setShowReel(true);
 
-      // Update user coins
       if (user) {
         setUser({ ...user, coins: res.updatedCoins });
       }
@@ -115,7 +113,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Animation finish
   const handleReelFinish = () => {
     setShowReel(false);
     if (pendingCard) {
@@ -123,7 +120,6 @@ export const App: React.FC = () => {
       setCards(prev => [pendingCard, ...prev]);
       setPendingCard(null);
     }
-    // Refresh user & tasks data in background
     api.getMe().then(d => {
       setUser(d.user);
       setStats(d.stats);
@@ -131,7 +127,6 @@ export const App: React.FC = () => {
     api.getTasks().then(d => setTasks(d.tasks || []));
   };
 
-  // Handle Favorite toggle
   const handleToggleFavorite = async (cardId: string) => {
     try {
       const res = await api.toggleFavorite(cardId);
@@ -141,7 +136,6 @@ export const App: React.FC = () => {
       if (latestCard && latestCard.id === cardId) {
         setLatestCard({ ...latestCard, is_favorite: res.isFavorite ? 1 : 0 });
       }
-      // Reload favorites
       const meData = await api.getMe();
       setFavorites(meData.favorites);
       setTasks((await api.getTasks()).tasks || []);
@@ -150,7 +144,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Handle Set Card of Day
   const handleSetCardOfDay = async (cardId: string) => {
     try {
       await api.setCardOfDay(cardId);
@@ -164,7 +157,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Handle Album claim
   const handleClaimAlbum = async (key: string) => {
     try {
       const res = await api.claimAlbum(key);
@@ -179,7 +171,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Handle Task claim
   const handleClaimTask = async (taskId: string) => {
     try {
       const res = await api.claimTask(taskId);
@@ -194,7 +185,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Handle Buy Stars cosmetic
   const handleBuyCosmetic = async (itemKey: string) => {
     try {
       const res = await api.createInvoice(itemKey);
@@ -206,7 +196,6 @@ export const App: React.FC = () => {
           }
         });
       } else {
-        // Simulated / test purchase
         alert(res.message || 'Предмет успешно приобретён!');
         loadAllData();
       }
@@ -215,7 +204,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Handle Equip cosmetic
   const handleEquipCosmetic = async (itemKey: string) => {
     try {
       const res = await api.equipCosmetic(itemKey);
@@ -228,7 +216,6 @@ export const App: React.FC = () => {
           equippedBg: res.equipped.bg,
         });
       }
-      // Update shop items equipped states
       setShopItems(prev =>
         prev.map(item => ({
           ...item,
@@ -246,11 +233,11 @@ export const App: React.FC = () => {
 
   if (isLoading || !user || !stats) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[#08090d] text-white space-y-4">
-        <Loader2 className="w-10 h-10 text-gold-400 animate-spin" />
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-black text-white space-y-4">
+        <Loader2 className="w-10 h-10 text-white animate-spin" />
         <div className="text-center font-mono space-y-1">
-          <p className="font-bold text-sm text-gold-400">BLACK CARDS & VIP PLASTIC</p>
-          <p className="text-xs text-white/40">Инициализация защищённого соединения...</p>
+          <p className="font-bold text-sm tracking-wider text-white">BLACK CARDS & VIP PLASTIC</p>
+          <p className="text-xs text-zinc-500">Загрузка данных...</p>
         </div>
       </div>
     );
@@ -259,77 +246,90 @@ export const App: React.FC = () => {
   const isCyberBg = user.equippedBg === 'bg_cyber' || user.equippedBg === 'bundle_deluxe';
 
   return (
-    <div className={`min-h-screen flex flex-col ${isCyberBg ? 'bg-cyber-vault' : ''}`}>
-      {/* Top Header & Side Drawer */}
-      <TopNav
-        currentTab={currentTab}
-        onSelectTab={setCurrentTab}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-        onOpenSupport={() => setIsSupportOpen(true)}
-        coins={user.coins}
-      />
+    <div className={`min-h-screen bg-black text-white flex justify-center ${isCyberBg ? 'bg-cyber-vault' : ''}`}>
+      {/* Centered Mobile App Frame (440px max width for mobile & desktop) */}
+      <div className="app-viewport flex flex-col pt-[max(env(safe-area-inset-top),16px)] px-3">
+        {/* Main Content Area */}
+        <main className="flex-1 w-full pb-20">
+          {currentTab === 'mint' && (
+            <MintTerminal
+              user={user}
+              stats={stats}
+              latestCard={latestCard}
+              onMintClick={handleMint}
+              onOpenTasks={() => setCurrentTab('tasks')}
+              onOpenCollection={() => setCurrentTab('collection')}
+              onToggleFavorite={handleToggleFavorite}
+              onSetCardOfDay={handleSetCardOfDay}
+              onOpenMenu={() => setIsMenuOpen(true)}
+              isLoading={isMinting}
+            />
+          )}
 
-      {/* Main Content Area */}
-      <main className="flex-1 w-full max-w-lg mx-auto pt-4 px-3">
-        {currentTab === 'mint' && (
-          <MintTerminal
-            user={user}
-            stats={stats}
-            latestCard={latestCard}
-            onMintClick={handleMint}
-            onOpenTasks={() => setCurrentTab('tasks')}
-            onOpenCollection={() => setCurrentTab('collection')}
-            onToggleFavorite={handleToggleFavorite}
-            isLoading={isMinting}
-          />
-        )}
+          {currentTab === 'collection' && (
+            <CollectionView
+              cards={cards}
+              equippedHolder={user.equippedHolder}
+              equippedEffect={user.equippedEffect}
+              onToggleFavorite={handleToggleFavorite}
+              onSetCardOfDay={handleSetCardOfDay}
+              cardOfDayId={cardOfDay?.id}
+            />
+          )}
 
-        {currentTab === 'collection' && (
-          <CollectionView
-            cards={cards}
-            equippedHolder={user.equippedHolder}
-            equippedEffect={user.equippedEffect}
-            onToggleFavorite={handleToggleFavorite}
-            onSetCardOfDay={handleSetCardOfDay}
-            cardOfDayId={cardOfDay?.id}
-          />
-        )}
+          {currentTab === 'albums' && (
+            <AlbumsView albums={albums} onClaim={handleClaimAlbum} />
+          )}
 
-        {currentTab === 'albums' && (
-          <AlbumsView albums={albums} onClaim={handleClaimAlbum} />
-        )}
+          {currentTab === 'tasks' && (
+            <TasksView tasks={tasks} onClaim={handleClaimTask} />
+          )}
 
-        {currentTab === 'tasks' && (
-          <TasksView tasks={tasks} onClaim={handleClaimTask} />
-        )}
+          {currentTab === 'shop' && (
+            <StarsShopView
+              items={shopItems}
+              sampleCard={latestCard}
+              onBuy={handleBuyCosmetic}
+              onEquip={handleEquipCosmetic}
+              isLoading={isLoading}
+            />
+          )}
 
-        {currentTab === 'shop' && (
-          <StarsShopView
-            items={shopItems}
-            sampleCard={latestCard}
-            onBuy={handleBuyCosmetic}
-            onEquip={handleEquipCosmetic}
-            isLoading={isLoading}
-          />
-        )}
+          {currentTab === 'profile' && (
+            <ProfileView
+              user={user}
+              cardOfDay={cardOfDay}
+              favorites={favorites}
+              leaderboard={leaderboard}
+              onOpenCard={card => {
+                setLatestCard(card);
+                setCurrentTab('mint');
+              }}
+            />
+          )}
 
-        {currentTab === 'profile' && (
-          <ProfileView
-            user={user}
-            cardOfDay={cardOfDay}
-            favorites={favorites}
-            leaderboard={leaderboard}
-            onOpenCard={card => {
-              setLatestCard(card);
-              setCurrentTab('mint');
-            }}
-          />
-        )}
+          {currentTab === 'history' && (
+            <HistoryView transactions={transactions} />
+          )}
+        </main>
 
-        {currentTab === 'history' && (
-          <HistoryView transactions={transactions} />
-        )}
-      </main>
+        {/* Top Drawer & Fixed Bottom Navigation */}
+        <TopNav
+          currentTab={currentTab}
+          onSelectTab={setCurrentTab}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenSupport={() => {
+            setSupportInitialTab('support');
+            setIsSupportOpen(true);
+          }}
+          onOpenPolicy={() => {
+            setSupportInitialTab('policy');
+            setIsSupportOpen(true);
+          }}
+          isMenuOpen={isMenuOpen}
+          setIsMenuOpen={setIsMenuOpen}
+        />
+      </div>
 
       {/* Reel Digit Spinning Animation Overlay */}
       {showReel && pendingCard && (
@@ -354,6 +354,7 @@ export const App: React.FC = () => {
       <SupportModal
         isOpen={isSupportOpen}
         onClose={() => setIsSupportOpen(false)}
+        initialTab={supportInitialTab}
       />
     </div>
   );
