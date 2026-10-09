@@ -18,6 +18,9 @@ export async function getDb(): Promise<DbInterface> {
 
   if (databaseUrl) {
     console.log('[DB] Connecting to PostgreSQL (Render Postgres)...');
+    // Ensure BIGINT (int8) is parsed as JavaScript Number
+    pg.types.setTypeParser(20, (val: string) => parseInt(val, 10));
+
     const pool = new pg.Pool({
       connectionString: databaseUrl,
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,

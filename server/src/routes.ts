@@ -255,7 +255,7 @@ router.post('/cards/mint', async (req, res) => {
     // Update tasks progress (e.g. mint_three)
     const today = getTodayString();
     await db.run(
-      `UPDATE tasks SET progress = MIN(target, progress + 1)
+      `UPDATE tasks SET progress = CASE WHEN progress + 1 > target THEN target ELSE progress + 1 END
        WHERE user_id = ? AND task_date = ? AND task_key = 'mint_three'`,
       [user.telegram_id, today]
     );
@@ -608,7 +608,7 @@ router.post('/shop/invoice', async (req, res) => {
     const db = await getDb();
     const cosmeticId = crypto.randomUUID();
     await db.run(
-      `INSERT OR IGNORE INTO user_cosmetics (id, user_id, item_key, acquired_at) VALUES (?, ?, ?, ?)`,
+      `INSERT INTO user_cosmetics (id, user_id, item_key, acquired_at) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING`,
       [cosmeticId, user.telegram_id, itemKey, Date.now()]
     );
     res.json({ simulated: true, message: `[DEMO] Предмет «${item.name}» успешно разблокирован!` });

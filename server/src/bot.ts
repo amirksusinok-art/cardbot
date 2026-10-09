@@ -108,7 +108,7 @@ export function initBot() {
         // Add cosmetic to user
         const cosmeticId = crypto.randomUUID();
         await db.run(
-          `INSERT OR IGNORE INTO user_cosmetics (id, user_id, item_key, acquired_at) VALUES (?, ?, ?, ?)`,
+          `INSERT INTO user_cosmetics (id, user_id, item_key, acquired_at) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING`,
           [cosmeticId, userId, itemKey, Date.now()]
         );
 
