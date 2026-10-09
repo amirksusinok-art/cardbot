@@ -93,8 +93,9 @@
 Выберите вашего бота и отправьте список:
 ```text
 start - Запустить терминал Black Cards
+policy - Политика конфиденциальности и правила
 terms - Условия использования (Terms of Service)
-paysupport - Поддержка по платежам Telegram Stars
+paysupport - Поддержка по платежам Telegram Stars (@stena10)
 ```
 
 ---

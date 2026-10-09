@@ -1,250 +1,209 @@
 import React from 'react';
-import { Card, BankName, MaterialName, CategoryName } from '../types.js';
+import { Card, BankName, MaterialName } from '../types.js';
 import { Shield, Sparkles, Wifi, Cpu, Award, Flame } from 'lucide-react';
 
 interface CardPreviewProps {
   card: Card;
   equippedHolder?: string | null;
   equippedEffect?: string | null;
-  showRarityTag?: boolean;
   className?: string;
   onClick?: () => void;
 }
 
-export const BANK_THEMES: Record<BankName, {
-  bgGradient: string;
+export const BANK_CONFIGS: Record<BankName, {
   accentColor: string;
-  borderClass: string;
   icon: any;
+  subText: string;
 }> = {
   'Рубарис': {
-    bgGradient: 'from-[#3d0309] via-[#1c0407] to-[#0a0203]',
     accentColor: '#ff2d55',
-    borderClass: 'border-red-900/40',
     icon: Flame,
+    subText: 'RUBARIS PRIVATE',
   },
   'Вельтари': {
-    bgGradient: 'from-[#1a0f2e] via-[#0f071e] to-[#07030e]',
-    accentColor: '#b5179e',
-    borderClass: 'border-purple-800/40',
+    accentColor: '#a855f7',
     icon: Sparkles,
+    subText: 'VELTARI BLACK',
   },
   'Озевия': {
-    bgGradient: 'from-[#03274f] via-[#02152e] to-[#010914]',
-    accentColor: '#00b4d8',
-    borderClass: 'border-cyan-800/40',
+    accentColor: '#00d4ff',
     icon: Shield,
+    subText: 'OZEVIA WORLD',
   },
   'Верданор': {
-    bgGradient: 'from-[#083023] via-[#041c14] to-[#020e0a]',
     accentColor: '#2ec4b6',
-    borderClass: 'border-emerald-800/40',
     icon: Award,
+    subText: 'VERDANOR RESERVE',
   },
   'Норвиан': {
-    bgGradient: 'from-[#0e1d32] via-[#081220] to-[#040910]',
-    accentColor: '#90e0ef',
-    borderClass: 'border-blue-900/40',
+    accentColor: '#94a3b8',
     icon: Shield,
+    subText: 'NORVIAN INFINITE',
   },
 };
 
 export const MATERIAL_STYLES: Record<MaterialName, {
-  class: string;
+  textureClass: string;
   isLight: boolean;
-  badgeBg: string;
-  badgeText: string;
+  textColor: string;
+  numberColor: string;
+  chipTone: string;
 }> = {
   'Classic Plastic': {
-    class: 'bg-gradient-to-tr from-[#15171e] to-[#252834]',
+    textureClass: 'texture-classic-plastic',
     isLight: false,
-    badgeBg: 'bg-zinc-800/90',
-    badgeText: 'text-zinc-200',
+    textColor: 'text-zinc-400',
+    numberColor: 'text-[#E2E8F0]',
+    chipTone: 'from-amber-200 to-amber-500',
   },
   'Matte Plastic': {
-    class: 'bg-[#101217]',
+    textureClass: 'texture-matte-plastic',
     isLight: false,
-    badgeBg: 'bg-zinc-800/90',
-    badgeText: 'text-zinc-200',
+    textColor: 'text-[#8E929B]',
+    numberColor: 'text-[#E2E8F0]',
+    chipTone: 'from-zinc-300 to-zinc-500', // Brushed silver chip for matte
   },
   'Gold': {
-    class: 'texture-gold',
-    isLight: true, // Gold has light background, so text MUST be dark!
-    badgeBg: 'bg-black/80',
-    badgeText: 'text-yellow-400 font-bold',
+    textureClass: 'texture-gold',
+    isLight: true,
+    textColor: 'text-amber-950 font-bold',
+    numberColor: 'text-zinc-950 font-black',
+    chipTone: 'from-amber-100 to-amber-600',
   },
   'Black Carbon': {
-    class: 'texture-carbon',
+    textureClass: 'texture-carbon',
     isLight: false,
-    badgeBg: 'bg-neutral-900/95 border border-neutral-700',
-    badgeText: 'text-neutral-100',
+    textColor: 'text-zinc-400',
+    numberColor: 'text-[#F1F5F9]',
+    chipTone: 'from-zinc-300 to-zinc-500',
   },
   'Titanium': {
-    class: 'texture-titanium border border-slate-400/40',
+    textureClass: 'texture-titanium',
     isLight: false,
-    badgeBg: 'bg-slate-900/95 border border-slate-400/50',
-    badgeText: 'text-slate-100 font-bold',
+    textColor: 'text-slate-300',
+    numberColor: 'text-white',
+    chipTone: 'from-slate-200 to-slate-400',
   },
   'Holographic': {
-    class: 'texture-holographic',
+    textureClass: 'texture-holographic',
     isLight: false,
-    badgeBg: 'bg-black/80 border border-pink-400/60',
-    badgeText: 'text-pink-300 font-extrabold',
+    textColor: 'text-pink-100',
+    numberColor: 'text-white',
+    chipTone: 'from-amber-200 to-yellow-500',
   },
-};
-
-export const CATEGORY_COLORS: Record<CategoryName, { bg: string; text: string; label: string }> = {
-  'Standard': { bg: 'bg-zinc-800/90', text: 'text-zinc-300', label: 'Обычный' },
-  'Pair': { bg: 'bg-blue-950/90', text: 'text-blue-300', label: 'Пара' },
-  'Triple': { bg: 'bg-emerald-950/90', text: 'text-emerald-300', label: 'Тройка' },
-  'Repeater': { bg: 'bg-amber-950/90', text: 'text-amber-300', label: 'Повтор' },
-  'Quad': { bg: 'bg-purple-950/90', text: 'text-purple-300', label: 'Каре' },
-  'Straight': { bg: 'bg-cyan-950/90', text: 'text-cyan-300', label: 'Стрит' },
-  'Mirror': { bg: 'bg-rose-950/90', text: 'text-rose-300', label: 'Зеркало' },
 };
 
 export const CardPreview: React.FC<CardPreviewProps> = ({
   card,
   equippedHolder,
   equippedEffect,
-  showRarityTag = true,
   className = '',
   onClick,
 }) => {
-  const bankTheme = BANK_THEMES[card.bank] || BANK_THEMES['Рубарис'];
-  const matStyle = MATERIAL_STYLES[card.material] || MATERIAL_STYLES['Classic Plastic'];
-  const catColor = CATEGORY_COLORS[card.category] || CATEGORY_COLORS['Standard'];
-  const BankIcon = bankTheme.icon;
+  const bankConfig = BANK_CONFIGS[card.bank] || BANK_CONFIGS['Рубарис'];
+  const matStyle = MATERIAL_STYLES[card.material] || MATERIAL_STYLES['Matte Plastic'];
+  const BankIcon = bankConfig.icon;
 
   const isHolderActive = equippedHolder === 'holder_vip' || equippedHolder === 'bundle_deluxe';
   const isEffectActive = equippedEffect === 'effect_matrix' || equippedEffect === 'bundle_deluxe';
 
-  // If gold material (light surface), ensure 100% dark text contrast
-  const textColor = matStyle.isLight ? 'text-zinc-950 font-black' : 'text-white';
-  const subTextColor = matStyle.isLight ? 'text-zinc-800 font-bold' : 'text-white/60';
-  const chipBorder = matStyle.isLight ? 'border-amber-800/60' : 'border-amber-300/60';
+  // Format expiry to MM/YY (clean Apple Wallet style)
+  const expiryParts = (card.expiry_date || '10/2099').split('/');
+  const shortExpiry = expiryParts.length === 2 ? `${expiryParts[0]}/${expiryParts[1].slice(-2)}` : card.expiry_date;
 
   return (
     <div
       onClick={onClick}
       className={`relative transition-all duration-300 select-none ${
-        isHolderActive ? 'p-2.5 holder-vip-acrylic bg-black/40' : ''
+        isHolderActive ? 'p-2 holder-vip-acrylic bg-black/40' : ''
       } ${className}`}
     >
-      {/* Physical Bank Card Object */}
+      {/* Physical Realistic Bank Card Container (Apple Wallet / Revolut style) */}
       <div
-        className={`relative aspect-[1.586/1] w-full rounded-[22px] p-5 sm:p-6 overflow-hidden border border-white/10 ${
-          bankTheme.borderClass
-        } ${matStyle.class} flex flex-col justify-between shadow-[0_20px_45px_rgba(0,0,0,0.7)] transition-transform active:scale-[0.99]`}
+        className={`relative aspect-[1.586/1] w-full rounded-[18px] p-5 sm:p-6 overflow-hidden border border-white/[0.08] ${
+          matStyle.textureClass
+        } flex flex-col justify-between shadow-[0_20px_45px_rgba(0,0,0,0.65)] transition-transform active:scale-[0.99]`}
       >
-        {/* Subtle Bank Blend Layer (only for non-gold/non-carbon to preserve texture) */}
-        {card.material !== 'Gold' && card.material !== 'Black Carbon' && card.material !== 'Holographic' && (
-          <div
-            className={`absolute inset-0 bg-gradient-to-br ${bankTheme.bgGradient} opacity-85 pointer-events-none`}
-          />
-        )}
+        {/* Subtle diagonal micro-glare */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.04] to-transparent pointer-events-none" />
 
-        {/* Specular Glare Arc */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent pointer-events-none" />
-
-        {/* TOP ROW: Bank Brand & SIM/EMV Smart Chip */}
+        {/* 1. TOP OF CARD: Bank Logo & Clean Chip/NFC */}
         <div className="relative z-10 flex items-center justify-between">
-          {/* Bank Brand & Country Pill */}
+          {/* Left: Bank Branding */}
           <div className="flex items-center space-x-2.5">
             <div
-              className={`w-8 h-8 rounded-xl flex items-center justify-center shadow-md ${
-                matStyle.isLight ? 'bg-black text-amber-400' : 'bg-black/60 border border-white/20'
+              className={`w-7 h-7 rounded-lg flex items-center justify-center shadow-inner ${
+                matStyle.isLight ? 'bg-black text-amber-400' : 'bg-white/[0.06] border border-white/[0.1]'
               }`}
-              style={{ color: matStyle.isLight ? undefined : bankTheme.accentColor }}
+              style={{ color: matStyle.isLight ? undefined : bankConfig.accentColor }}
             >
-              <BankIcon className="w-4 h-4" />
+              <BankIcon className="w-3.5 h-3.5" />
             </div>
 
             <div>
-              <div className="flex items-center space-x-1.5">
-                <span className={`font-black text-base sm:text-lg tracking-wide ${textColor}`}>
-                  {card.bank}
-                </span>
-              </div>
-              <div className="flex items-center space-x-1 text-[10px] font-mono tracking-wider">
-                <span className={subTextColor}>🇷🇺 VIP PRIVATE</span>
-              </div>
+              <span className={`font-black text-sm tracking-wider uppercase block leading-none ${
+                matStyle.isLight ? 'text-zinc-950' : 'text-white'
+              }`}>
+                {card.bank}
+              </span>
+              <span className={`text-[9px] font-mono tracking-widest block mt-0.5 ${matStyle.textColor}`}>
+                {bankConfig.subText}
+              </span>
             </div>
           </div>
 
-          {/* Right: Contactless Icon & Gold EMV Smart Chip */}
-          <div className="flex items-center space-x-3">
-            <Wifi className={`w-4 h-4 rotate-90 ${subTextColor}`} />
+          {/* Right: Contactless Icon & EMV Smart Chip */}
+          <div className="flex items-center space-x-2.5">
+            <Wifi className={`w-3.5 h-3.5 rotate-90 opacity-60 ${matStyle.isLight ? 'text-zinc-900' : 'text-white'}`} />
 
-            {/* Realistic Gold EMV Chip with Cutout Lines */}
-            <div className={`w-10 h-7 rounded-lg bg-gradient-to-br from-amber-200 via-yellow-400 to-amber-600 border ${chipBorder} flex items-center justify-center shadow-md relative overflow-hidden`}>
-              <div className="w-full h-[1px] bg-amber-900/40 absolute top-2.5" />
-              <div className="w-full h-[1px] bg-amber-900/40 absolute bottom-2.5" />
-              <div className="h-full w-[1px] bg-amber-900/40 absolute left-3.5" />
-              <div className="h-full w-[1px] bg-amber-900/40 absolute right-3.5" />
-              <Cpu className="w-3.5 h-3.5 text-amber-950/70 relative z-10" />
+            {/* Smart EMV Chip */}
+            <div className={`w-9 h-6 rounded-md bg-gradient-to-br ${matStyle.chipTone} border border-white/20 flex items-center justify-center shadow-sm relative overflow-hidden`}>
+              <div className="w-full h-[0.5px] bg-black/30 absolute top-2" />
+              <div className="w-full h-[0.5px] bg-black/30 absolute bottom-2" />
+              <div className="h-full w-[0.5px] bg-black/30 absolute left-3" />
+              <div className="h-full w-[0.5px] bg-black/30 absolute right-3" />
+              <Cpu className="w-3 h-3 text-black/50 relative z-10" />
             </div>
           </div>
         </div>
 
-        {/* CENTER: Prominent Bold Card Number */}
-        <div className="relative z-10 my-auto py-2">
+        {/* 2. CENTER: Bold Embossed Monospace Card Number */}
+        <div className="relative z-10 my-auto py-1 text-center">
           <div
-            className={`font-mono font-black tracking-[0.14em] text-lg sm:text-2xl text-center transition-all ${
+            className={`font-mono font-black tracking-[0.14em] text-lg sm:text-2xl transition-all ${
               isEffectActive
-                ? 'effect-cyber-neon font-black drop-shadow-[0_0_12px_#00d4ff]'
+                ? 'effect-cyber-neon drop-shadow-[0_0_12px_#00e5ff]'
                 : matStyle.isLight
                 ? 'text-zinc-950 drop-shadow-[0_1px_1px_rgba(255,255,255,0.4)]'
-                : 'text-white drop-shadow-[0_2px_5px_rgba(0,0,0,0.9)]'
+                : 'text-[#E2E8F0] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]'
             }`}
           >
             {card.card_number}
           </div>
         </div>
 
-        {/* BOTTOM ROW: Expiry, Code & Rarity Tag */}
+        {/* 3. BOTTOM OF CARD: Cardholder Name, Expiry & Hologram (NO metadata clutter!) */}
         <div className="relative z-10 flex items-end justify-between pt-1">
-          {/* Left Details */}
+          {/* Left: Cardholder Name & Expiry */}
           <div className="space-y-0.5">
-            <div className={`flex items-center space-x-1.5 text-[10px] font-mono ${subTextColor}`}>
+            <div className={`text-[10px] font-mono tracking-wider font-extrabold uppercase ${
+              matStyle.isLight ? 'text-zinc-900' : 'text-white/90'
+            }`}>
+              VIP CARDHOLDER
+            </div>
+            <div className={`flex items-center space-x-1.5 text-[9px] font-mono ${matStyle.textColor}`}>
               <span>VALID THRU:</span>
               <span className={`font-bold ${matStyle.isLight ? 'text-zinc-900' : 'text-white'}`}>
-                {card.expiry_date}
+                {shortExpiry}
               </span>
-            </div>
-
-            <div className={`text-[10px] font-mono tracking-wider font-semibold ${subTextColor}`}>
-              {card.collection_code}
             </div>
           </div>
 
-          {/* Right: Rarity Tag & DEMO badge */}
-          <div className="flex flex-col items-end space-y-1">
-            <div className="flex items-center space-x-1.5">
-              {/* Category pill */}
-              <span
-                className={`text-[10px] px-2 py-0.5 rounded-md font-mono font-bold shadow-sm ${catColor.bg} ${catColor.text}`}
-              >
-                {catColor.label}
-              </span>
-
-              {/* Material pill */}
-              <span
-                className={`text-[10px] px-2 py-0.5 rounded-md font-mono font-bold shadow-sm ${matStyle.badgeBg} ${matStyle.badgeText}`}
-              >
-                {card.material}
-              </span>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <span className={`text-[10px] font-mono font-extrabold ${matStyle.isLight ? 'text-zinc-900' : 'text-amber-400'}`}>
-                {card.score.toLocaleString()} PTS
-              </span>
-              <span className={`text-[9px] font-mono tracking-widest px-1 rounded border ${
-                matStyle.isLight ? 'border-zinc-900/40 text-zinc-800' : 'border-white/30 text-white/50'
-              }`}>
-                DEMO
-              </span>
+          {/* Right: Security Hologram Sticker (Metallic circles) */}
+          <div className="flex items-center">
+            <div className="relative w-8 h-5 flex items-center justify-end">
+              <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-200 opacity-80 shadow-sm" />
+              <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-red-500 to-amber-400 opacity-75 -ml-2.5 shadow-sm mix-blend-screen" />
             </div>
           </div>
         </div>

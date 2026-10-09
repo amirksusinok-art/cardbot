@@ -71,7 +71,7 @@ export const SupportModal: React.FC<SupportModalProps> = ({ isOpen, onClose, ini
                   <b className="text-emerald-400 block font-mono">💬 Связь с поддержкой</b>
                   <p className="text-zinc-300 text-[11px]">
                     По любым вопросам и возвратам Stars пишите администратору:  
-                    <span className="text-white font-bold block mt-0.5">@amirksusinok</span>
+                    <span className="text-white font-bold block mt-0.5">@stena10</span>
                   </p>
                 </div>
               </>

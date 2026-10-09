@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Menu, X, Zap, Layers, BookOpen, Target, Star, User, History, Settings, HelpCircle, ShieldAlert } from 'lucide-react';
+import React from 'react';
+import { X, Zap, Layers, BookOpen, Target, Star, User, History, Settings, HelpCircle, ShieldAlert } from 'lucide-react';
 import { triggerHaptic } from '../utils/telegram.js';
 
 export type TabKey =
@@ -34,7 +34,7 @@ export const TopNav: React.FC<TopNavProps> = ({
     { key: 'mint', label: '1. Выпуск карт', icon: Zap, color: 'text-amber-400' },
     { key: 'collection', label: '2. Коллекция', icon: Layers, color: 'text-cyan-400' },
     { key: 'albums', label: '3. Альбомы', icon: BookOpen, color: 'text-emerald-400' },
-    { key: 'tasks', label: '4. Задания', icon: Target, color: 'text-rose-400' },
+    { key: 'tasks', label: '4. Задания дня', icon: Target, color: 'text-rose-400' },
     { key: 'shop', label: '5. Магазин Stars', icon: Star, color: 'text-yellow-400' },
     { key: 'profile', label: '6. Профиль', icon: User, color: 'text-purple-400' },
     { key: 'history', label: '7. История операций', icon: History, color: 'text-blue-400' },
@@ -48,7 +48,7 @@ export const TopNav: React.FC<TopNavProps> = ({
 
   return (
     <>
-      {/* Side Menu Drawer */}
+      {/* Side Menu Drawer (Optional auxiliary menu) */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-50 flex animate-fadeIn">
           {/* Backdrop */}
@@ -58,24 +58,22 @@ export const TopNav: React.FC<TopNavProps> = ({
           />
 
           {/* Drawer content */}
-          <div className="relative w-72 max-w-[85vw] h-full bg-[#0c0e17] border-r border-white/10 p-5 flex flex-col justify-between z-10 shadow-2xl">
+          <div className="relative w-72 max-w-[85vw] h-full bg-[#0B0C0E] border-r border-white/[0.06] p-5 flex flex-col justify-between z-10 shadow-2xl">
             <div className="space-y-6 pt-4">
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-white/10">
+              <div className="flex items-center justify-between pb-4 border-b border-white/[0.06]">
                 <div>
                   <h3 className="font-black text-sm tracking-wider text-white">BLACK CARDS</h3>
-                  <p className="text-[10px] font-mono text-gold-400">VIP Private Banking</p>
+                  <p className="text-[10px] font-mono text-amber-400">VIP Private Banking</p>
                 </div>
                 <button
                   onClick={() => setIsMenuOpen(false)}
-                  className="p-1 rounded-full bg-white/5 text-white/60 hover:text-white"
+                  className="p-1 rounded-full bg-white/[0.05] text-[#8E929B] hover:text-white"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Navigation items list */}
-              <nav className="space-y-1.5">
+              <nav className="space-y-1">
                 {menuItems.map(item => {
                   const Icon = item.icon;
                   const isActive = currentTab === item.key;
@@ -86,8 +84,8 @@ export const TopNav: React.FC<TopNavProps> = ({
                       onClick={() => handleSelect(item.key as TabKey)}
                       className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-mono transition-all text-left ${
                         isActive
-                          ? 'bg-white/15 text-white font-bold border border-white/20'
-                          : 'text-white/70 hover:bg-white/5 hover:text-white'
+                          ? 'bg-white/[0.08] text-white font-bold'
+                          : 'text-[#8E929B] hover:bg-white/[0.04] hover:text-white'
                       }`}
                     >
                       <Icon className={`w-4 h-4 ${item.color}`} />
@@ -98,15 +96,14 @@ export const TopNav: React.FC<TopNavProps> = ({
               </nav>
             </div>
 
-            {/* Bottom Actions: Settings, Support & Policy */}
-            <div className="pt-4 border-t border-white/10 space-y-1.5">
+            <div className="pt-4 border-t border-white/[0.06] space-y-1">
               <button
                 onClick={() => {
                   triggerHaptic('light');
                   setIsMenuOpen(false);
                   onOpenPolicy();
                 }}
-                className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-mono text-amber-300 hover:text-white hover:bg-white/5 transition-all text-left"
+                className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-mono text-amber-300 hover:text-white hover:bg-white/[0.04] transition-all text-left"
               >
                 <ShieldAlert className="w-4 h-4 text-amber-400" />
                 <span>Политика и правила</span>
@@ -118,7 +115,7 @@ export const TopNav: React.FC<TopNavProps> = ({
                   setIsMenuOpen(false);
                   onOpenSettings();
                 }}
-                className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-mono text-white/60 hover:text-white hover:bg-white/5 transition-all text-left"
+                className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-mono text-[#8E929B] hover:text-white hover:bg-white/[0.04] transition-all text-left"
               >
                 <Settings className="w-4 h-4 text-slate-400" />
                 <span>Настройки</span>
@@ -130,7 +127,7 @@ export const TopNav: React.FC<TopNavProps> = ({
                   setIsMenuOpen(false);
                   onOpenSupport();
                 }}
-                className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-mono text-white/60 hover:text-white hover:bg-white/5 transition-all text-left"
+                className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-mono text-[#8E929B] hover:text-white hover:bg-white/[0.04] transition-all text-left"
               >
                 <HelpCircle className="w-4 h-4 text-emerald-400" />
                 <span>Поддержка</span>
@@ -140,12 +137,12 @@ export const TopNav: React.FC<TopNavProps> = ({
         </div>
       )}
 
-      {/* Fixed Bottom Navigation Bar (Centered within app-viewport) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#090a0f]/95 backdrop-blur-lg border-t border-white/10 px-2 py-2 flex items-center justify-around max-w-[440px] mx-auto shadow-2xl">
+      {/* 6. НИЖНИЙ ТАББАР (BOTTOM NAVIGATION) — Полупрозрачный блюр, стандарт Telegram Mini Apps */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#0B0C0E]/90 backdrop-blur-2xl border-t border-white/[0.06] px-3 py-2 flex items-center justify-around max-w-[440px] mx-auto shadow-2xl">
         <button
           onClick={() => handleSelect('mint')}
           className={`flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition-all ${
-            currentTab === 'mint' ? 'text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'
+            currentTab === 'mint' ? 'text-amber-400 font-bold' : 'text-[#8E929B] hover:text-white'
           }`}
         >
           <Zap className="w-5 h-5" />
@@ -155,7 +152,7 @@ export const TopNav: React.FC<TopNavProps> = ({
         <button
           onClick={() => handleSelect('collection')}
           className={`flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition-all ${
-            currentTab === 'collection' ? 'text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'
+            currentTab === 'collection' ? 'text-white font-bold' : 'text-[#8E929B] hover:text-white'
           }`}
         >
           <Layers className="w-5 h-5" />
@@ -165,7 +162,7 @@ export const TopNav: React.FC<TopNavProps> = ({
         <button
           onClick={() => handleSelect('albums')}
           className={`flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition-all ${
-            currentTab === 'albums' ? 'text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'
+            currentTab === 'albums' ? 'text-emerald-400 font-bold' : 'text-[#8E929B] hover:text-white'
           }`}
         >
           <BookOpen className="w-5 h-5" />
@@ -175,7 +172,7 @@ export const TopNav: React.FC<TopNavProps> = ({
         <button
           onClick={() => handleSelect('shop')}
           className={`flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition-all ${
-            currentTab === 'shop' ? 'text-yellow-400 font-bold' : 'text-zinc-500 hover:text-zinc-300'
+            currentTab === 'shop' ? 'text-yellow-400 font-bold' : 'text-[#8E929B] hover:text-white'
           }`}
         >
           <Star className="w-5 h-5" />
@@ -185,7 +182,7 @@ export const TopNav: React.FC<TopNavProps> = ({
         <button
           onClick={() => handleSelect('profile')}
           className={`flex flex-col items-center space-y-1 py-1 px-3 rounded-xl transition-all ${
-            currentTab === 'profile' ? 'text-white font-bold' : 'text-zinc-500 hover:text-zinc-300'
+            currentTab === 'profile' ? 'text-purple-400 font-bold' : 'text-[#8E929B] hover:text-white'
           }`}
         >
           <User className="w-5 h-5" />
